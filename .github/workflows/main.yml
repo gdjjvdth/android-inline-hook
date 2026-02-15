@@ -1,4 +1,4 @@
-name: Build ShadowHook APK
+name: Build ShadowHook APK (Ultimate Fix)
 
 on:
   workflow_dispatch:
@@ -17,14 +17,22 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
-      - name: Force CMake Version and Build
+      - name: Auto-Fix CMake Version in Code
         run: |
-          # إجبار المشروع برمجياً على قبول النسخة المتاحة من CMake
+          echo "جاري البحث عن إصدار 4.0.3 واستبداله بـ 3.22.1 في كل ملفات المشروع..."
+          # هذا الأمر يبحث في كل ملفات build.gradle ويغير الإصدار العنيد تلقائياً
+          find . -name "build.gradle" -exec sed -i 's/version "4.0.3"/version "3.22.1"/g' {} +
+          find . -name "build.gradle" -exec sed -i "s/version '4.0.3'/version '3.22.1'/g" {} +
+          find . -name "build.gradle.kts" -exec sed -i 's/version("4.0.3")/version("3.22.1")/g' {} +
+
+      - name: Build with Gradle
+        run: |
           chmod +x gradlew
+          # إجبار النظام على استخدام إصدار CMake المتوفر
           ./gradlew :app:assembleDebug -Pandroid.cmakeVersion=3.22.1
-          
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ShadowHook-App
+          name: ShadowHook-Final-App
           path: app/build/outputs/apk/debug/*.apk
