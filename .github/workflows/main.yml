@@ -1,11 +1,11 @@
 name: Build ShadowHook APK
 
 on:
-  workflow_dispatch: # هذا السطر يصنع لك زر التشغيل اليدوي
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # سيرفرات جوجل/جيت هاب السريعة
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
@@ -16,6 +16,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'zulu'
+
+      - name: Install Missing CMake Tools
+        run: |
+          echo "جاري تثبيت أدوات بناء C++ المفقودة..."
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.22.1"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.18.1"
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "cmake;3.10.2.4988404"
 
       - name: Build with Gradle
         run: |
